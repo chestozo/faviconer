@@ -1,0 +1,17 @@
+{
+    "name": "Faviconer",
+    "version": "0.1",
+    "description": "Detects requests to favicon",
+    "browser_action": {
+        "default_icon": "icon.jpg"
+    },
+    "background_page": "bg.html", 
+    "options_page": "options.html",
+    "permissions": [
+        "tabs",
+        "experimental",
+        "experimental.webRequest",
+        "webRequest",
+        "notifications"
+    ]
+}
