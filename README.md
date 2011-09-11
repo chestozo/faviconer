@@ -7,7 +7,7 @@ NOTE 1: currently I could not deploy it at Chrome web store with resolution "Ext
 But you can install it by loading an unpacked extension in at `chrome://extensions/`.
 
 NOTE 2: for running this extension u will also need to run browser in special mode like this:
-`/Applications/Web/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --enable-experimental-extension-apis`.
+    `/Applications/Web/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --enable-experimental-extension-apis`.
 
 Features
 --------
