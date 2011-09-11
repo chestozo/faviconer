@@ -6,7 +6,8 @@ If you want to detect browser requests (like `favicon.ico` requests with additio
 NOTE 1: currently I could not deploy it at Chrome web store with resolution "Extension or apps with experimental APIs are not allowed in the gallery."
 But you can install it by loading an unpacked extension in at `chrome://extensions/`.
 
-NOTE 2: for running this extension u will also need to run browser in special mode like this: `/Applications/Web/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --enable-experimental-extension-apis`.
+NOTE 2: for running this extension u will also need to run browser in special mode like this:
+`/Applications/Web/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --enable-experimental-extension-apis`.
 
 Features
 --------
