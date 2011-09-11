@@ -8,7 +8,7 @@ But you can install it by loading an unpacked extension in at `chrome://extensio
 
 NOTE 2: for running this extension u will also need to run browser in special mode like this:
 
-    `/Applications/Web/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --enable-experimental-extension-apis`.
+    /Applications/Web/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --enable-experimental-extension-apis
 
 Features
 --------
@@ -22,6 +22,8 @@ There you can find a single text field. This is a rules list.
 One line - one rule.
 Every rule is a simple mask with a single asterix at the end of the pattern (if needed).
 
-For example: `http://some-page.url*`
+For example:
+    
+    http://some-page.url*
 
 Do not forget to press Save after changing the rules list.
