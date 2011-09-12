@@ -4,13 +4,18 @@ var notifications = webkitNotifications;
 var tabs = chrome.tabs;
 
 var Interceptor = function() {
-    this.count = 0;
+    this.notes = [];
 }
 
 Interceptor.prototype.init = function() {
     this.reload();
+    chrome.browserAction.onClicked.addListener(this._clearAll.bind(this));
     chrome.experimental.webRequest.onBeforeRequest.addListener(this.handle.bind(this));
     return this;
+}
+
+Interceptor.prototype._clearAll = function(tab) {
+    $.each(this.notes, function(i,note) { note.cancel(); });
 }
 
 Interceptor.prototype.handle = function(details) {
@@ -22,21 +27,37 @@ Interceptor.prototype.handle = function(details) {
     var tab = tabs.get(
         details.tabId,
         function(tab) {
+            if (!tab) {
+                return;
+            }
             this._notify(tab.url, url);
         }.bind(this)
     );
 }
 
 Interceptor.prototype._notify = function(page_url, request_url) {
-    this.incCount();
     var notification = notifications
         .createNotification(
             "icon.jpg",
             page_url,
             request_url
         );
-    notification.onclose = this.decCount.bind(this);
+
+    this.notes.push(notification);
+
+    notification.onclose = function() { this._remove(notification); }.bind(this);
     notification.show();
+
+    this.updateCount();
+}
+
+Interceptor.prototype._remove = function(note) {
+    for (var i = 0; i < this.notes.length; i++) {
+        if (this.notes[i] === note) {
+            this.notes.splice(i, 1);
+        }
+    }
+    this.updateCount();
 }
 
 Interceptor.prototype._matchRules = function(url) {
@@ -48,22 +69,13 @@ Interceptor.prototype._matchRules = function(url) {
     return false;
 }
 
-Interceptor.prototype.incCount = function() {
-    this.updateCount(1);
-}
-
-Interceptor.prototype.decCount = function() {
-    this.updateCount(-1);
-}
-
 Interceptor.prototype.updateCount = function(diff) {
-    this.count += diff;
-
-    if (this.count === 0) {
+    var count = this.notes.length;
+    if (count === 0) {
         chrome.browserAction.setBadgeText({ "text": "" });
     } else {
         chrome.browserAction.setBadgeBackgroundColor({ "color": [255,51,51, 255]});
-        chrome.browserAction.setBadgeText({ "text": " " + this.count + " " });
+        chrome.browserAction.setBadgeText({ "text": " " + count + " " });
     }
 }
 
