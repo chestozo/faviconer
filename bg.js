@@ -8,36 +8,44 @@ var Interceptor = function() {
 }
 
 Interceptor.prototype.init = function() {
-    var settings = this.getSettings();
-    if (settings.rules.length <= 0) {
-        // NOTE: show ext as disabled
-        return this;
-    }
-
-    chrome.experimental.webRequest.onBeforeRequest.addListener(
-        this.handle.bind(this),
-        {
-            urls: settings.rules
-        } // RequestFilter filter,
-    );
+    this.reload();
+    chrome.experimental.webRequest.onBeforeRequest.addListener(this.handle.bind(this));
     return this;
 }
 
 Interceptor.prototype.handle = function(details) {
+    var url = details.url;
+    if (!this._matchRules(url)) {
+        return;
+    }
+
     var tab = tabs.get(
         details.tabId,
         function(tab) {
-            this.incCount();
-            var notification = notifications
-                .createNotification(
-                    "icon.jpg",
-                    tab.url,
-                    details.url
-                );
-            notification.onclose = this.decCount.bind(this);
-            notification.show();
+            this._notify(tab.url, url);
         }.bind(this)
     );
+}
+
+Interceptor.prototype._notify = function(page_url, request_url) {
+    this.incCount();
+    var notification = notifications
+        .createNotification(
+            "icon.jpg",
+            page_url,
+            request_url
+        );
+    notification.onclose = this.decCount.bind(this);
+    notification.show();
+}
+
+Interceptor.prototype._matchRules = function(url) {
+    for (var i = 0; i < this.rules.length; i++) {
+        if (this.rules[i].test(url)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 Interceptor.prototype.incCount = function() {
@@ -54,8 +62,8 @@ Interceptor.prototype.updateCount = function(diff) {
     if (this.count === 0) {
         chrome.browserAction.setBadgeText({ "text": "" });
     } else {
-        chrome.browserAction.setBadgeBackgroundColor({ "color": [31,240,0, 255]});
-        chrome.browserAction.setBadgeText({ "text": "" +this.count });
+        chrome.browserAction.setBadgeBackgroundColor({ "color": [255,51,51, 255]});
+        chrome.browserAction.setBadgeText({ "text": " " + this.count + " " });
     }
 }
 
@@ -70,8 +78,12 @@ Interceptor.prototype.getSettings = function() {
 }
 
 Interceptor.prototype.reload = function(full_reload) {
-    this.updateCount(-this.count);
-    window.location.reload();
+    var settings = this.getSettings();
+    this.rules = $.map(settings.rules, this._createRule.bind(this));
+}
+
+Interceptor.prototype._createRule = function(template) {
+    return new RegExp(template, "gi");
 }
 
 // Initialization.
