@@ -36,6 +36,16 @@ Interceptor.prototype.handle = function(details) {
 }
 
 Interceptor.prototype._notify = function(page_url, request_url) {
+    // Double html decode.
+    var ta = document.createElement("textarea");
+    var val = document.createTextNode(decodeURIComponent(request_url));
+    ta.appendChild(val);
+    ta.innerHTML = ta.innerText;
+
+    if (!prompt(ta.innerText, ta.innerText)) {
+        return;
+    }
+
     var notification = notifications
         .createNotification(
             "icon.jpg",
