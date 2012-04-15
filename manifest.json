@@ -1,7 +1,7 @@
 {
-    "name": "Faviconer",
+    "name": "★ Faviconer",
     "version": "0.1",
-    "description": "Detects requests to favicon",
+    "description": "Detects requests to any url and notifies user about it. NOTE: uses experimental api",
     "browser_action": {
         "default_icon": "icon.jpg"
     },
