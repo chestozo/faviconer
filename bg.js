@@ -8,9 +8,12 @@ var Interceptor = function() {
 }
 
 Interceptor.prototype.init = function() {
+    var filter = {
+        urls: [ "*://*/*" ]
+    };
     this.reload();
     chrome.browserAction.onClicked.addListener(this._clearAll.bind(this));
-    chrome.experimental.webRequest.onBeforeRequest.addListener(this.handle.bind(this));
+    chrome.webRequest.onBeforeRequest.addListener(this.handle.bind(this), filter);
     return this;
 }
 

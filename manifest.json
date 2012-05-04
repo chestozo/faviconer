@@ -7,11 +7,11 @@
     },
     "background_page": "bg.html", 
     "options_page": "options.html",
+
     "permissions": [
         "tabs",
-        "experimental",
-        "experimental.webRequest",
         "webRequest",
+        "*://*/*",
         "notifications"
     ]
 }
