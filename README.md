@@ -3,8 +3,6 @@ Faviconer
 
 If you want to detect browser requests (like `favicon.ico` requests with additional information) - this extension is for you!
 
-NOTE 1: does not handle requests to `favicon.ico` now - [stackoverflow question about it](http://stackoverflow.com/questions/10450561/webrequest-api-does-not-handle-requests-to-favicon-ico stackoverflow question)
-
 Features
 --------
 * Add as many request masks as you want (at options page)
