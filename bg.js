@@ -1,5 +1,9 @@
 ;(function($){
 
+// -------------------------------------------------------------------------- //
+// Background page starts from here.
+// -------------------------------------------------------------------------- //
+
 var notifications = webkitNotifications;
 var tabs = chrome.tabs;
 
