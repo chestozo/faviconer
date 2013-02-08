@@ -55,7 +55,7 @@ Interceptor.prototype._notify = function(page_url, request_url) {
 
     var notification = notifications
         .createNotification(
-            "icon.jpg",
+            'icon.png',
             page_url,
             request_url
         );
