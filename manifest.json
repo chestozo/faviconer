@@ -7,10 +7,7 @@
         "default_icon": "icon.png"
     },
     "background": {
-        "scripts": [
-            "jquery.min.js",
-            "bg.js"
-        ]
+        "scripts": [ "bg.js" ]
     },
     "options_page": "options.html",
 
