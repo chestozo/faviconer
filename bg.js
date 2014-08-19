@@ -4,7 +4,7 @@
 // Background page starts from here.
 // -------------------------------------------------------------------------- //
 
-var notifications = webkitNotifications;
+var notifications = chrome.notifications;
 var tabs = chrome.tabs;
 
 var Interceptor = function() {
@@ -27,6 +27,7 @@ Interceptor.prototype._clearAll = function(tab) {
 
 Interceptor.prototype.handle = function(details) {
     var url = details.url;
+
     if (!this._matchRules(url)) {
         return;
     }
