@@ -32,15 +32,19 @@ Interceptor.prototype.handle = function(details) {
         return;
     }
 
-    var tab = tabs.get(
-        details.tabId,
-        function(tab) {
-            if (!tab) {
-                return;
-            }
-            this._notify(tab.url, url);
-        }.bind(this)
-    );
+    if (details.tabId > -1) {
+        var tab = tabs.get(
+            details.tabId,
+            function(tab) {
+                if (!tab) {
+                    return;
+                }
+                this._notify(tab.url, url);
+            }.bind(this)
+        );
+    } else {
+        this._notify('NO TAB URL', url);
+    }
 }
 
 Interceptor.prototype._notify = function(page_url, request_url) {
