@@ -1,7 +1,8 @@
 {
-    "manifest_version": 2,
     "name": "Faviconer",
-    "version": "0.1",
+    "version": "0.2",
+    "manifest_version": 2,
+
     "description": "Detects requests to any url and notifies user about it. NOTE: uses experimental api",
 
     "browser_action": {
