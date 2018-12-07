@@ -1,4 +1,4 @@
-;(function($){
+;(function(){
 
 // -------------------------------------------------------------------------- //
 // Background page starts from here.
@@ -22,7 +22,7 @@ Interceptor.prototype.init = function() {
 }
 
 Interceptor.prototype._clearAll = function(tab) {
-    $.each(this.notes, function(i,note) { note.cancel(); });
+    this.notes.forEach(note => note.cancel());
 }
 
 Interceptor.prototype.handle = function(details) {
@@ -113,7 +113,7 @@ Interceptor.prototype.getSettings = function() {
 
 Interceptor.prototype.reload = function(full_reload) {
     var settings = this.getSettings();
-    this.rules = $.map(settings.rules, this._createRule.bind(this));
+    this.rules = settings.rules.map(this._createRule.bind(this));
 }
 
 Interceptor.prototype._createRule = function(template) {
@@ -125,4 +125,4 @@ var onload = setTimeout(init, 0); function init() {
     window.faviconer = new Interceptor().init();
 }
 
-}(jQuery));
+}());
