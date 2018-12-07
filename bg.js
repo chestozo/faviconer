@@ -4,12 +4,14 @@
 // Background page starts from here.
 // -------------------------------------------------------------------------- //
 
+const SETTINGS_KEY = 'settings';
+
 var notifications = chrome.notifications;
 var tabs = chrome.tabs;
 
 var Interceptor = function() {
     this.notes = [];
-}
+};
 
 Interceptor.prototype.init = function() {
     var filter = {
@@ -19,11 +21,11 @@ Interceptor.prototype.init = function() {
     chrome.browserAction.onClicked.addListener(this._clearAll.bind(this));
     chrome.webRequest.onBeforeRequest.addListener(this.handle.bind(this), filter);
     return this;
-}
+};
 
 Interceptor.prototype._clearAll = function(tab) {
     this.notes.forEach(note => note.cancel());
-}
+};
 
 Interceptor.prototype.handle = function(details) {
     var url = details.url;
@@ -45,7 +47,7 @@ Interceptor.prototype.handle = function(details) {
     } else {
         this._notify('NO TAB URL', url);
     }
-}
+};
 
 Interceptor.prototype._notify = function(page_url, request_url) {
     // Double html decode.
@@ -71,7 +73,7 @@ Interceptor.prototype._notify = function(page_url, request_url) {
     notification.show();
 
     this.updateCount();
-}
+};
 
 Interceptor.prototype._remove = function(note) {
     for (var i = 0; i < this.notes.length; i++) {
@@ -80,7 +82,7 @@ Interceptor.prototype._remove = function(note) {
         }
     }
     this.updateCount();
-}
+};
 
 Interceptor.prototype._matchRules = function(url) {
     for (var i = 0; i < this.rules.length; i++) {
@@ -89,7 +91,7 @@ Interceptor.prototype._matchRules = function(url) {
         }
     }
     return false;
-}
+};
 
 Interceptor.prototype.updateCount = function(diff) {
     var count = this.notes.length;
@@ -99,26 +101,32 @@ Interceptor.prototype.updateCount = function(diff) {
         chrome.browserAction.setBadgeBackgroundColor({ "color": [255,51,51, 255]});
         chrome.browserAction.setBadgeText({ "text": " " + count + " " });
     }
-}
+};
 
-Interceptor.prototype.getSettings = function() {
-    var value = localStorage["settings"];
-    if (!value) {
-        return {
-            rules: []
-        };
-    }
-    return JSON.parse(value);
-}
+Interceptor.prototype._getSettings = function() {
+    return new Promise((resolve) => {
+        chrome.storage.local.get([ SETTINGS_KEY ], (result) => {
+            let settings = result[SETTINGS_KEY];
 
-Interceptor.prototype.reload = function(full_reload) {
-    var settings = this.getSettings();
+            if (!settings || !settings.rules) {
+                settings = {
+                    rules: []
+                };
+            }
+
+            resolve(settings);
+        });
+    });
+};
+
+Interceptor.prototype.reload = async function(full_reload) {
+    const settings = await this._getSettings();
     this.rules = settings.rules.map(this._createRule.bind(this));
-}
+};
 
 Interceptor.prototype._createRule = function(template) {
     return new RegExp(template, "gi");
-}
+};
 
 // Initialization.
 var onload = setTimeout(init, 0); function init() {
