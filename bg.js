@@ -11,6 +11,7 @@ var tabs = chrome.tabs;
 
 var Interceptor = function() {
     this.notes = [];
+    this._enabled = true;
 };
 
 Interceptor.prototype.init = function() {
@@ -18,17 +19,22 @@ Interceptor.prototype.init = function() {
         urls: [ "*://*/*" ]
     };
     this.reload();
-    chrome.browserAction.onClicked.addListener(this._clearAll.bind(this));
+    // chrome.browserAction.onClicked.addListener(this._clearAll.bind(this));
+    chrome.browserAction.onClicked.addListener(this._toggleEnabled.bind(this));
     chrome.webRequest.onBeforeRequest.addListener(this.handle.bind(this), filter);
     return this;
 };
 
-Interceptor.prototype._clearAll = function(tab) {
-    this.notes.forEach(note => note.cancel());
-};
+// Interceptor.prototype._clearAll = function(tab) {
+//     this.notes.forEach(note => note.cancel());
+// };
 
 Interceptor.prototype.handle = function(details) {
     var url = details.url;
+
+    if (!this._enabled) {
+        return;
+    }
 
     if (!this._matchRules(url)) {
         return;
@@ -60,19 +66,20 @@ Interceptor.prototype._notify = function(page_url, request_url) {
         return;
     }
 
-    var notification = notifications
-        .createNotification(
-            'icon.png',
-            page_url,
-            request_url
-        );
+    // TODO not used
+    // var notification = notifications
+    //     .createNotification(
+    //         'icon.png',
+    //         page_url,
+    //         request_url
+    //     );
 
-    this.notes.push(notification);
+    // this.notes.push(notification);
 
-    notification.onclose = function() { this._remove(notification); }.bind(this);
-    notification.show();
+    // notification.onclose = function() { this._remove(notification); }.bind(this);
+    // notification.show();
 
-    this.updateCount();
+    // this.updateCount();
 };
 
 Interceptor.prototype._remove = function(note) {
@@ -126,6 +133,17 @@ Interceptor.prototype.reload = async function(full_reload) {
 
 Interceptor.prototype._createRule = function(template) {
     return new RegExp(template, "gi");
+};
+
+Interceptor.prototype._toggleEnabled = function(template) {
+    this._enabled = !this._enabled;
+
+    if (this._enabled) {
+        chrome.browserAction.setBadgeText({ 'text': '' });
+    } else {
+        chrome.browserAction.setBadgeBackgroundColor({ 'color': '#E84C3D' });
+        chrome.browserAction.setBadgeText({ 'text': 'off' });
+    }
 };
 
 // Initialization.
