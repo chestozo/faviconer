@@ -5,20 +5,26 @@
 // -------------------------------------------------------------------------- //
 
 const SETTINGS_KEY = 'settings';
+const ENABLED_KEY = 'enabled';
 
 var notifications = chrome.notifications;
 var tabs = chrome.tabs;
 
-var Interceptor = function() {
+const Interceptor = function() {
     this.notes = [];
-    this._enabled = true;
+    this._enabled = false;
 };
 
-Interceptor.prototype.init = function() {
-    var filter = {
+Interceptor.prototype.init = async function() {
+    const filter = {
         urls: [ "*://*/*" ]
     };
+
     this.reload();
+
+    this._enabled = await this._getEnabled();
+    this._syncButtonState();
+
     // chrome.browserAction.onClicked.addListener(this._clearAll.bind(this));
     chrome.browserAction.onClicked.addListener(this._toggleEnabled.bind(this));
     chrome.webRequest.onBeforeRequest.addListener(this.handle.bind(this), filter);
@@ -126,7 +132,17 @@ Interceptor.prototype._getSettings = function() {
     });
 };
 
-Interceptor.prototype.reload = async function(full_reload) {
+Interceptor.prototype._getEnabled = function() {
+    return new Promise((resolve) => {
+        chrome.storage.local.get([ ENABLED_KEY ], (result) => {
+            let enabled = result[ENABLED_KEY];
+            enabled = typeof enabled === 'boolean' ? enabled : true;
+            resolve(enabled);
+        });
+    });
+};
+
+Interceptor.prototype.reload = async function() {
     const settings = await this._getSettings();
     this.rules = settings.rules.map(this._createRule.bind(this));
 };
@@ -135,9 +151,19 @@ Interceptor.prototype._createRule = function(template) {
     return new RegExp(template, "gi");
 };
 
-Interceptor.prototype._toggleEnabled = function(template) {
+Interceptor.prototype._toggleEnabled = function() {
     this._enabled = !this._enabled;
+    this._syncButtonState();
+    this._saveEnabled();
+};
 
+Interceptor.prototype._saveEnabled = function() {
+    return new Promise((resolve) => {
+        chrome.storage.local.set({ [ENABLED_KEY]: this._enabled }, resolve);
+    });
+};
+
+Interceptor.prototype._syncButtonState = function() {
     if (this._enabled) {
         chrome.browserAction.setBadgeText({ 'text': '' });
     } else {
@@ -147,8 +173,13 @@ Interceptor.prototype._toggleEnabled = function(template) {
 };
 
 // Initialization.
-var onload = setTimeout(init, 0); function init() {
-    window.faviconer = new Interceptor().init();
+var onload = setTimeout(init, 0);
+
+function init() {
+    const faviconer = new Interceptor();
+    faviconer.init();
+
+    window.faviconer = faviconer;
 }
 
 }());
